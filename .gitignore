@@ -1,0 +1,8 @@
+
+# python/pycharm
+*.pyc
+.idea/
+
+# django database
+*.sqlite3
+**/migrations
