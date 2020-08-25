@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form action="{% url 'accounts:registration' %}" method="POST">
+        {% csrf_token %}
+        <div class="fieldWrapper">
+            {{ form.username.errors }}
+            {{ form.username.label_tag }}
+            {{ form.username.help_text }}
+            {{ form.username }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.first_name.errors }}
+            {{ form.first_name.label_tag }}
+            {{ form.first_name.help_text }}
+            {{ form.first_name }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.last_name.errors }}
+            {{ form.last_name.label_tag }}
+            {{ form.last_name.help_text }}
+            {{ form.last_name }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.password1.errors }}
+            {{ form.password1.label_tag }}
+            {{ form.password1.help_text }}
+            {{ form.password1 }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.password2.errors }}
+            {{ form.password2.label_tag }}
+            {{ form.password2.help_text }}
+            {{ form.password2 }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</body>
+</html>
