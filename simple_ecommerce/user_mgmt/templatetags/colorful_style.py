@@ -5,8 +5,8 @@ from django import template
 register = template.Library()
 
 colors = [('aqua', 'black'), ('black', 'white'), ('blueviolet', 'white'), ('brown', 'white'), ('darkgreen', 'white'),
-          ('limegreen', 'black'), ('orange', 'black'), ('pink', 'black'), ('red', 'white'), ('turquoise', 'black'),
-          ('white', 'black'), ('yellow', 'black')]
+          ('lightgrey', 'black'), ('limegreen', 'black'), ('orange', 'black'), ('pink', 'black'), ('red', 'white'),
+          ('turquoise', 'black'), ('yellow', 'black')]
 
 
 @register.simple_tag

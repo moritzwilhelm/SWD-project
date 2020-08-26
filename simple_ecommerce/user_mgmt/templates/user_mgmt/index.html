@@ -1,0 +1,7 @@
+{% extends 'user_mgmt/base.html' %}
+{% block content %}
+{% load colorful_style %}
+
+<h1>Welcome {{ user.get_full_name }}</h1>
+
+{% endblock %}

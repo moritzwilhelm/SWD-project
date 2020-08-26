@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Moritz Wilhelm; Daniel Emmel">
-    <title>Ecommerce Shop</title>
+    <title>Official Speedwagon Foundation Shop</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
@@ -15,20 +15,60 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
             crossorigin="anonymous"></script>
+    {% load colorful_style %}
+    <style>
+        .pillar-men {
+        {% colorful_style %}
+        }
+    </style>
 </head>
 <body>
-<div class="content-wrapper">
-    <div class="container-fluid">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message|linebreaksbr }}
-                </div>
-            {% endfor %}
-        {% endif %}
-        {% block content %}
-        {% endblock %}
+<nav class="navbar navbar-expand-lg navbar-light" style="border: 1px solid black">
+    <a class="navbar-brand">SFS</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            {% if not user.is_authenticated %}
+                <li class="nav-item{% if 'login' in request.path %} active{% endif %}">
+                    <a class="nav-link" href="{% url 'accounts:login' %}">
+                        Login
+                    </a>
+                </li>
+                <li class="nav-item {% if 'registration' in request.path %} active{% endif %}">
+                    <a class="nav-link" href="{% url 'accounts:registration' %}">
+                        Registration
+                    </a>
+                </li>
+                </ul>
+            {% else %}
+                <li class="nav-item{% if 'index' in request.path %} active{% endif %}">
+                    <a class="nav-link" href="{% url 'accounts:index' %}">
+                        Home
+                    </a>
+                </li>
+                </ul>
+                <form action="{% url 'accounts:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn">Logout</button>
+                </form>
+            {% endif %}
     </div>
+</nav>
+<br>
+<div class="container-fluid">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message|linebreaksbr }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% block content %}
+    {% endblock %}
+</div>
 </div>
 </body>
 </html>

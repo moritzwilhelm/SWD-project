@@ -29,6 +29,8 @@ ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'user_mgmt.User'
 
+LOGIN_REDIRECT_URL = '/index/'
+
 # Application definition
 
 INSTALLED_APPS = [
