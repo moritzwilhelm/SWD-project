@@ -1,5 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
+from django.forms import EmailField, Form, PasswordInput, CharField
 from django.utils.crypto import get_random_string
+from django.utils.translation import gettext_lazy as _
 
 from user_mgmt.models import User
 
@@ -18,3 +20,13 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
 
         return user
+
+
+class PasswordResetRequestForm(Form):
+    username = EmailField(max_length=254)
+
+
+class CustomPasswordResetForm(Form):
+    password1 = CharField(label=_("Password"), max_length=32, widget=PasswordInput)
+    password2 = CharField(label=_("Password confirmation"), max_length=32, widget=PasswordInput,
+                          help_text='Enter the same password as before, for verification.')

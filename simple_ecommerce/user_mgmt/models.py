@@ -1,6 +1,6 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
-from django.db.models import EmailField, CharField, DateTimeField
+from django.db.models import EmailField, CharField, DateTimeField, Model, OneToOneField, CASCADE
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
@@ -52,3 +52,8 @@ class User(AbstractUser):
         return self.is_active
 
     objects = UserManager()
+
+
+class OneTimePassword(Model):
+    user = OneToOneField(User, on_delete=CASCADE)
+    password = CharField(_('password'), max_length=16)

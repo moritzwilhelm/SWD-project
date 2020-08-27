@@ -37,6 +37,7 @@
         {% endif %}
 
         <button type="submit" class="btn" style="{% colorful_style %}">Submit</button>
+        <a class="btn" style="{% colorful_style %}" href="{% url 'accounts:password_forgotten' %}">Forgot password?</a>
     </form>
 
 {% endblock %}
