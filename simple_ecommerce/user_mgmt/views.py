@@ -39,7 +39,8 @@ def registration_view(request):
             login(request, user)
 
             messages.success(request, f"Activation link sent to '{user.username}'")
-            send_mail('Activation Link', f"127.0.0.1:3000/accounts/{user.username}/verify/{user.activation_token}/",
+            send_mail('Activation Link',
+                      f"http://localhost:3000/accounts/{user.username}/verify/{user.activation_token}/",
                       'shop@speedwagon.foundation', [user.username])
             return redirect(reverse('accounts:index'))
         messages.warning(request, 'Registration failed')

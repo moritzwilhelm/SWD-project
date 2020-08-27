@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-{% load colorful_style %}
 
-<h1>Welcome <i>{{ user.get_full_name }}</i>!</h1>
+    {% load colorful_style %}
+
+    <h1>Welcome <i>{{ user.get_full_name }}</i>!</h1>
 
 {% endblock %}

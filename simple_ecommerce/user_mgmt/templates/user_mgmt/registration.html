@@ -1,67 +1,68 @@
 {% extends 'base.html' %}
 {% block content %}
-{% load colorful_style %}
 
-<form action="{% url 'accounts:registration' %}" method="POST">
-    {% csrf_token %}
-    <div class="fieldWrapper">
-        {% if form.username.errors %}
-            <div class="alert alert-danger">
-                {{ form.username.errors }}
-            </div>
-        {% endif %}
-        {{ form.username.label_tag }}
-        {{ form.username.help_text }}
-        {{ form.username }}
-    </div>
-    <div class="fieldWrapper">
-        {% if form.first_name.errors %}
-            <div class="alert alert-danger">
-                {{ form.first_name.errors }}
-            </div>
-        {% endif %}
-        {{ form.first_name.label_tag }}
-        {{ form.first_name.help_text }}
-        {{ form.first_name }}
-    </div>
-    <div class="fieldWrapper">
-        {% if form.last_name.errors %}
-            <div class="alert alert-danger">
-                {{ form.last_name.errors }}
-            </div>
-        {% endif %}
-        {{ form.last_name.label_tag }}
-        {{ form.last_name.help_text }}
-        {{ form.last_name }}
-    </div>
-    <div class="fieldWrapper">
-        {% if form.password1.errors %}
-            <div class="alert alert-danger">
-                {{ form.password1.errors }}
-            </div>
-        {% endif %}
-        {{ form.password1.label_tag }}
-        {{ form.password1.help_text }}
-        {{ form.password1 }}
-    </div>
-    <div class="fieldWrapper">
-        {% if form.password2.errors %}
-            <div class="alert alert-danger">
-                {{ form.password2.errors }}
-            </div>
-        {% endif %}
-        {{ form.password2.label_tag }}
-        {{ form.password2.help_text }}
-        {{ form.password2 }}
-    </div>
+    {% load colorful_style %}
 
-     {% if form.non_field_errors %}
-        <div class="alert alert-danger">
-            {{ form.non_field_errors }}
+    <form action="{% url 'accounts:registration' %}" method="POST">
+        {% csrf_token %}
+        <div class="fieldWrapper">
+            {% if form.username.errors %}
+                <div class="alert alert-danger">
+                    {{ form.username.errors }}
+                </div>
+            {% endif %}
+            {{ form.username.label_tag }}
+            {{ form.username.help_text }}
+            {{ form.username }}
         </div>
-    {% endif %}
+        <div class="fieldWrapper">
+            {% if form.first_name.errors %}
+                <div class="alert alert-danger">
+                    {{ form.first_name.errors }}
+                </div>
+            {% endif %}
+            {{ form.first_name.label_tag }}
+            {{ form.first_name.help_text }}
+            {{ form.first_name }}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.last_name.errors %}
+                <div class="alert alert-danger">
+                    {{ form.last_name.errors }}
+                </div>
+            {% endif %}
+            {{ form.last_name.label_tag }}
+            {{ form.last_name.help_text }}
+            {{ form.last_name }}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.password1.errors %}
+                <div class="alert alert-danger">
+                    {{ form.password1.errors }}
+                </div>
+            {% endif %}
+            {{ form.password1.label_tag }}
+            {{ form.password1.help_text }}
+            {{ form.password1 }}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.password2.errors %}
+                <div class="alert alert-danger">
+                    {{ form.password2.errors }}
+                </div>
+            {% endif %}
+            {{ form.password2.label_tag }}
+            {{ form.password2.help_text }}
+            {{ form.password2 }}
+        </div>
 
-    <button type="submit" class="btn" style="{% colorful_style %}">Submit</button>
-</form>
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn" style="{% colorful_style %}">Submit</button>
+    </form>
 
 {% endblock %}
