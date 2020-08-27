@@ -31,6 +31,8 @@ AUTH_USER_MODEL = 'user_mgmt.User'
 
 LOGIN_REDIRECT_URL = '/index/'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # Application definition
 
 INSTALLED_APPS = [

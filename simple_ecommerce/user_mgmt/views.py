@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
+from django.core.mail import send_mail
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -36,10 +37,10 @@ def registration_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            # print registration link
-            messages.success(request,
-                             f"Registration sucessful!\n"
-                             f"Activate your account at: /accounts/{user.username}/verify/{user.activation_token}/")
+
+            messages.success(request, f"Activation link sent to '{user.username}'")
+            send_mail('Activation Link', f"127.0.0.1:3000/accounts/{user.username}/verify/{user.activation_token}/",
+                      'shop@speedwagon.foundation', [user.username])
             return redirect(reverse('accounts:index'))
         messages.warning(request, 'Registration failed')
         return render(request, 'user_mgmt/registration.html', {'form': form})
