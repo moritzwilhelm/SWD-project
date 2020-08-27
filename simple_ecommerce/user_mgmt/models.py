@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
-from django.db.models import EmailField, CharField
+from django.db.models import EmailField, CharField, DateTimeField
+from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
@@ -17,6 +18,7 @@ class UserManager(BaseUserManager):
         username = self.normalize_email(username)
         user = self.model(username=username, **extra_fields)
         user.set_password(password)
+        user.datetime_joined = timezone.now()
         user.activation_token = get_random_string(length=16)
         user.save(using=self._db)
         return user
@@ -39,14 +41,14 @@ class User(AbstractUser):
                           error_messages={'unique': _("A user with that username already exists.")})
     email = None
 
+    date_joined = None
+
+    datetime_joined = DateTimeField(_('date joined'), blank=True, null=True)
+
     activation_token = CharField(_('first name'), max_length=16, blank=True)
 
     @property
     def enabled(self):
         return self.is_active
-
-    @property
-    def datetime_joined(self):
-        return self.date_joined
 
     objects = UserManager()

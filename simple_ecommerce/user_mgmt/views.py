@@ -2,9 +2,10 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 from user_mgmt.forms import CustomUserCreationForm
@@ -47,7 +48,11 @@ def registration_view(request):
 @require_GET
 def verify(request, email, token):
     user = get_object_or_404(User, username=email, activation_token=token)
-    user.is_active = True
-    user.save()
-    messages.success(request, 'Account successfully activated')
-    return redirect(reverse('accounts:index'))
+    if not user.is_active:
+        user.is_active = True
+        user.datetime_joined = timezone.now()
+        user.save()
+        messages.success(request, 'Account successfully activated')
+        return redirect(reverse('accounts:index'))
+    else:
+        raise Http404
