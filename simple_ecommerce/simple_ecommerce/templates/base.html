@@ -23,15 +23,15 @@
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light" style="border: 1px solid black">
+<nav class="navbar navbar-expand-lg navbar-light border">
     <a class="navbar-brand">SFS</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            {% if not user.is_authenticated %}
+        {% if not user.is_authenticated %}
+            <ul class="navbar-nav mr-auto">
                 <li class="nav-item{% if 'login' in request.path %} active{% endif %}">
                     <a class="nav-link" href="{% url 'accounts:login' %}">
                         Login
@@ -42,19 +42,20 @@
                         Registration
                     </a>
                 </li>
-                </ul>
-            {% else %}
+            </ul>
+        {% else %}
+            <ul class="navbar-nav mr-auto">
                 <li class="nav-item{% if 'index' in request.path %} active{% endif %}">
                     <a class="nav-link" href="{% url 'accounts:index' %}">
                         Home
                     </a>
                 </li>
-                </ul>
-                <form action="{% url 'accounts:logout' %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn">Logout</button>
-                </form>
-            {% endif %}
+            </ul>
+            <form action="{% url 'accounts:logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn">Logout</button>
+            </form>
+        {% endif %}
     </div>
 </nav>
 <br>
@@ -68,7 +69,6 @@
     {% endif %}
     {% block content %}
     {% endblock %}
-</div>
 </div>
 </body>
 </html>
