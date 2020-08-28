@@ -10,6 +10,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from google.auth.transport import requests
+from google.oauth2 import id_token
 
 from user_mgmt.forms import CustomUserCreationForm, PasswordResetRequestForm, CustomPasswordResetForm
 from user_mgmt.models import User, OneTimePassword
@@ -137,3 +139,28 @@ def reset_password(request):
         return render(request, 'user_mgmt/reset.html', {'form': form})
     else:
         return HttpResponse(status=403)
+
+
+@require_POST
+def token_sign_in(request):
+    token = request.POST.get('id_token', '')
+    if not token:
+        return HttpResponse(status=400)
+    try:
+        client_id = '39346139449-nrl3aj1sc0cijkbpg4h0prtgbmb8trs1.apps.googleusercontent.com'
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), client_id)
+        username = idinfo['email']
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            user = User.objects.create_user(username=username, password=None, first_name=idinfo['given_name'],
+                                            last_name=idinfo['family_name'])
+            user.is_active = True
+            user.datetime_joined = timezone.now()
+            user.save()
+
+        login(request, user)
+        return HttpResponse(status=200)
+    except ValueError:
+        return HttpResponse(status=400)

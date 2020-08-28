@@ -15,4 +15,6 @@ urlpatterns = [
     path('accounts/password-reset/', views.password_forgotten, name='password_forgotten'),
     path('accounts/reset/', views.otp_verification, name='otp'),
     path('accounts/reset/submit/', views.reset_password, name='reset_password'),
+
+    path('accounts/tokensignin/', views.token_sign_in, name='tokensignin')
 ]

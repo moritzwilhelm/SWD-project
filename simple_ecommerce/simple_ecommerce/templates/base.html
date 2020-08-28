@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Moritz Wilhelm; Daniel Emmel">
+    <meta name="google-signin-client_id"
+          content="39346139449-nrl3aj1sc0cijkbpg4h0prtgbmb8trs1.apps.googleusercontent.com">
     <title>Official Speedwagon Foundation Shop</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
@@ -15,6 +17,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
             crossorigin="anonymous"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light border">
@@ -47,8 +50,16 @@
             </ul>
             <form action="{% url 'accounts:logout' %}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn">Logout</button>
+                <button type="submit" class="btn" onclick="gapi.auth2.getAuthInstance().signOut()">Logout
+                </button>
             </form>
+            <script>
+                window.onload = function () {
+                    gapi.load('auth2', function () {
+                        gapi.auth2.init()
+                    });
+                }
+            </script>
         {% endif %}
     </div>
 </nav>
