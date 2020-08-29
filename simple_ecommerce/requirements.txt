@@ -1,1 +1,2 @@
-google-auth
+google-auth~=1.21.0
+Django~=3.0.5

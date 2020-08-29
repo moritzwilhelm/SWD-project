@@ -67,7 +67,7 @@ def verify(request, email, token):
 @require_http_methods(['GET', 'POST'])
 def password_forgotten(request):
     if request.method == 'GET':
-        return render(request, 'user_mgmt/passwort_forgotten.html', {'form': PasswordResetRequestForm()})
+        return render(request, 'user_mgmt/password_forgotten.html', {'form': PasswordResetRequestForm()})
     else:
         form = PasswordResetRequestForm(request.POST)
         if form.is_valid():
@@ -84,8 +84,8 @@ def password_forgotten(request):
                           f"Reset your password at http://localhost:3000/accounts/reset/ using the OTP: {otp.password}",
                           'shop@speedwagon.foundation', [user.username])
 
-            messages.success(request, f"Passwort reset instructions sent to '{username}'")
-        return render(request, 'user_mgmt/passwort_forgotten.html', {'form': form})
+            messages.success(request, f"Password reset instructions sent to '{username}'")
+        return render(request, 'user_mgmt/password_forgotten.html', {'form': form})
 
 
 @require_http_methods(['GET', 'POST'])
