@@ -54,6 +54,6 @@ class User(AbstractUser):
     objects = UserManager()
 
 
-class OneTimePassword(Model):
+class PasswordResetToken(Model):
     user = OneToOneField(User, on_delete=CASCADE)
-    password = CharField(_('password'), max_length=16)
+    value = CharField(_('value'), max_length=16)

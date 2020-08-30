@@ -4,7 +4,7 @@
     {% load colorful_style %}
 
     <h1>Enter your new password.</h1>
-    <form action="{% url 'accounts:reset_password' %}" method="post">
+    <form action="{{ request.path }}" method="post">
         {% csrf_token %}
         <div class="fieldWrapper">
             {% if form.password1.errors %}

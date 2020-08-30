@@ -14,7 +14,7 @@ from google.auth.transport import requests
 from google.oauth2 import id_token
 
 from user_mgmt.forms import CustomUserCreationForm, PasswordResetRequestForm, CustomPasswordResetForm
-from user_mgmt.models import User, OneTimePassword
+from user_mgmt.models import User, PasswordResetToken
 
 
 @login_required()
@@ -66,6 +66,9 @@ def verify(request, email, token):
 
 @require_http_methods(['GET', 'POST'])
 def password_forgotten(request):
+    if request.user.is_authenticated:
+        raise Http404
+
     if request.method == 'GET':
         return render(request, 'user_mgmt/password_forgotten.html', {'form': PasswordResetRequestForm()})
     else:
@@ -73,42 +76,18 @@ def password_forgotten(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             try:
-                user = User.objects.get(username=username)
-                otp, _ = OneTimePassword.objects.get_or_create(user=user)
-                otp.password = get_random_string(length=16)
-                otp.save()
+                user = User.objects.get(username=username, is_active=True)
+                token, _ = PasswordResetToken.objects.get_or_create(user=user)
+                token.value = get_random_string(length=16)
+                token.save()
+                send_mail('Password reset link',
+                          f"Reset your password at http://localhost:3000/accounts/{user.username}/reset/{token.value}/",
+                          'shop@speedwagon.foundation', [user.username])
             except User.DoesNotExist:
                 pass
-            else:
-                send_mail('One time password',
-                          f"Reset your password at http://localhost:3000/accounts/reset/ using the OTP: {otp.password}",
-                          'shop@speedwagon.foundation', [user.username])
 
             messages.success(request, f"Password reset instructions sent to '{username}'")
         return render(request, 'user_mgmt/password_forgotten.html', {'form': form})
-
-
-@require_http_methods(['GET', 'POST'])
-def otp_verification(request):
-    if request.method == 'GET':
-        if request.user.is_authenticated:
-            return HttpResponse(status=401)
-        else:
-            return render(request, 'user_mgmt/otp.html')
-    else:
-        username = request.POST.get('username', '')
-        password = request.POST.get('password', '')
-
-        try:
-            user = User.objects.get(username=username)
-            otp = OneTimePassword.objects.get(user=user, password=password)
-            login(request, user)
-            otp.delete()
-            messages.success(request, f"Successfully authenticated as '{user.username}'")
-            return render(request, 'user_mgmt/reset.html', {'form': CustomPasswordResetForm()})
-        except (User.DoesNotExist, OneTimePassword.DoesNotExist):
-            messages.warning(request, 'Invalid credentials')
-            return redirect(reverse('accounts:otp'))
 
 
 def _is_valid_password_reset(request, password1, password2):
@@ -120,25 +99,28 @@ def _is_valid_password_reset(request, password1, password2):
             return False
         return True
     else:
+        messages.warning(request, 'The two password fields didn’t match.')
         return False
 
 
-@login_required()
-@require_POST
-def reset_password(request):
-    if request.user.is_authenticated:
-        form = CustomPasswordResetForm(request.POST, request.user)
-        if not form.is_valid():
-            messages.warning(request, 'The two password fields didn’t match.')
-        elif _is_valid_password_reset(request, form.cleaned_data['password1'], form.cleaned_data['password2']):
-            request.user.set_password(form.cleaned_data['password1'])
-            request.user.save()
-            messages.success(request, f"Successfully reset password for '{request.user.username}'")
+@require_http_methods(['GET', 'POST'])
+def reset_password(request, email, token):
+    user = get_object_or_404(User, username=email, is_active=True)
+    token = get_object_or_404(PasswordResetToken, user=user, value=token)
+
+    if request.method == 'GET':
+        return render(request, 'user_mgmt/reset.html', {'form': CustomPasswordResetForm()})
+    else:
+        form = CustomPasswordResetForm(request.POST, user)
+        if form.is_valid() and \
+                _is_valid_password_reset(request, form.cleaned_data['password1'], form.cleaned_data['password2']):
+            user.set_password(form.cleaned_data['password1'])
+            user.save()
+            token.delete()
+            messages.success(request, f"Successfully reset password for '{user.username}'")
             return redirect(reverse('accounts:login'))
 
         return render(request, 'user_mgmt/reset.html', {'form': form})
-    else:
-        return HttpResponse(status=403)
 
 
 @require_POST
