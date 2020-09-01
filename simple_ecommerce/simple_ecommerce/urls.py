@@ -22,7 +22,8 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('', include('user_mgmt.urls'))
+    path('', include('user_mgmt.urls')),
+    path('', include('shop.urls'))
 ]
 
 # register static files base
