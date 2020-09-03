@@ -1,4 +1,36 @@
 {% extends 'base.html' %}
 {% block content %}
 
+    {% load colorful_style %}
+    {% load shop_extras %}
+    <div style="display: flex;justify-content: center">
+        <div class="card w-50">
+            <div class="card-header" style="{% colorful_style %}">{{ user.username }}</div>
+            <div class="card-body" style="display: flex;flex-direction: column;align-items: center;">
+                <img src="{% pillar_man %}" alt="profile picture">
+                <ul>
+                    <li>First name: <b>{{ user.first_name }}</b></li>
+                </ul>
+                <ul>
+                    <li>Last name: <b>{{ user.last_name }}</b></li>
+                </ul>
+                <ul>
+                    <li>Member since: <b>{{ user.datetime_joined }}</b></li>
+                </ul>
+            </div>
+            <div class="card-footer" style="{% colorful_style %}"></div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="card">
+        <div class="card-header" style="{% colorful_style %}">Last orders:</div>
+        <div class="card-body" style="display: flex;flex-direction: column;">
+            {% for order in orders %}
+                <a href="{% url 'shop:show_basket' order.id %}">{{ order.date_placed|date:'M. d, Y' }}</a>
+            {% endfor %}
+        </div>
+        <div class="card-footer" style="{% colorful_style %}"></div>
+    </div>
 {% endblock %}
