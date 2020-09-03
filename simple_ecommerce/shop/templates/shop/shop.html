@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    {% load static %}
+    {% load colorful_style %}
+    {% load shop_extras %}
+
+    <script>
+        function show_product_info(id) {
+            window.location.href = `{% url 'shop:list_products' %}#${id}`
+        }
+
+        window.onhashchange = function () {
+            let id = window.location.hash.slice(1)
+            let xhr = new XMLHttpRequest()
+            if (!id)
+                return
+
+            xhr.open('GET', `/shop/products/${id}/`, false)
+            xhr.send()
+
+            if (xhr.status >= 400)
+                return
+
+            let data = JSON.parse(xhr.responseText)
+
+            Object.keys(data).forEach(function (key) {
+                console.log(key)
+                $(`#${key}`).text(data[key])
+                $('#shop_modal').modal('toggle')
+            });
+            $('#product_id').val(data['id'])
+        }
+        window.onload = window.onhashchange
+    </script>
+
+    <div class="modal fade" id="shop_modal" tabindex="-1" role="dialog" aria-labelledby="shop_modalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Buy Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <u>Name:</u>
+                    <div id="name"></div>
+                    <u>Slug:</u>
+                    <div id="slug"></div>
+                    <u>Description:</u>
+                    <div id="description"></div>
+                    <u>Price (in €):</u>
+                    <div id="price"></div>
+                    <u>Still available:</u>
+                    <div id="count"></div>
+                </div>
+                <form action="{% url 'shop:add_to_cart' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-footer">
+                        <input id="product_id" name="product_id" value="" hidden>
+                        <button type="submit" class="btn" style="{% colorful_style %};float: right">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% for product in products %}
+        <div class="card" onclick="show_product_info({{ product.id }})">
+            <div class="card-header" style="display:flex;justify-content: space-between;{% colorful_style %}">
+                {{ product.name }}
+                <i>
+                    by {% if product.user is not None %}
+                    {{ product.user.get_full_name }}{% elif product.partner is not None %}
+                    {{ product.partner.name }}{% else %}Speedwagon Foundation{% endif %}
+                </i>
+            </div>
+            <div class="card-body" style="display: flex;align-items: center;text-align: center">
+                <img src="{{ product.image }}" alt="image of {{ product.name }}"
+                     style="width:15%;border-radius: 0.5em;border: 2px solid grey"
+                     onerror="this.src='{% pillar_man %}'">
+                <i style="width: 100%">{{ product.description }}</i>
+            </div>
+        </div>
+        <br>
+    {% endfor %}
+
+{% endblock %}

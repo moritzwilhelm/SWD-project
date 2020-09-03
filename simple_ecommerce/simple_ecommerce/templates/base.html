@@ -6,6 +6,8 @@
     <meta name="google-signin-client_id"
           content="39346139449-nrl3aj1sc0cijkbpg4h0prtgbmb8trs1.apps.googleusercontent.com">
     <title>Official Speedwagon Foundation Shop</title>
+    {% load static %}
+    <link rel="shortcut icon" type="image/png" href="{% static 'img/Pillar_Men.ico' %}"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
@@ -47,10 +49,21 @@
                         Home
                     </a>
                 </li>
+                <li class="nav-item{% if 'products' in request.path %} active{% endif %}">
+                    <a class="nav-link" href="{% url 'shop:list_products' %}">
+                        Shop
+                    </a>
+                </li>
+                <li class="nav-item{% if 'basket' in request.path %} active{% endif %}">
+                    <a class="nav-link" href="{% url 'shop:show_current_basket' %}">
+                        My Basket
+                    </a>
+                </li>
             </ul>
             <form action="{% url 'accounts:logout' %}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn" onclick="gapi.auth2.getAuthInstance().signOut()">Logout
+                {% load colorful_style %}
+                <button type="submit" class="btn" style="{% colorful_style%}" onclick="gapi.auth2.getAuthInstance().signOut()">Logout
                 </button>
             </form>
             <script>
