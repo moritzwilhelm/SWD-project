@@ -27,9 +27,6 @@ def public(request, email):
     except User.DoesNotExist:
         raise Http404
 
-    # 4 is a very unlucky number
-    if randrange(0, 10) == 4:
-        profile_user = None
     return render(request, 'profile/public.html', context={'profile_user': profile_user})
 
 

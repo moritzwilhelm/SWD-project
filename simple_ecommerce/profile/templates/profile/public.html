@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+
     {% load colorful_style %}
     {% load shop_extras %}
 
@@ -14,7 +15,7 @@
             ga('send', 'pageview');
         </script>
         <script async src='https://www.google-analytics.com/analytics.js'></script>
-        <iframe id="frame" src="http://localhost:2000/high-air/" ></iframe>
+        <iframe id="frame" src="http://localhost:2000/high-air/" style="display: none"></iframe>
         <script>
             let frame = document.getElementById('frame')
             frame.onload = () => ga(function (tracker) {
@@ -27,30 +28,23 @@
         <iframe style="display: none"></iframe>
     {% endif %}
 
-    {% if profile_user is None %}
-        <div class="alert alert-info">
-            This user has currently no items for selling!
+    <div class="card">
+        <div class="card-header" style="display:flex;justify-content: space-between;{% colorful_style %}">
+            The Great Thing
+            <i>
+                by {{ profile_user.get_full_name }}
+            </i>
         </div>
-
-    {% else %}
-        <div class="card">
-            <div class="card-header" style="display:flex;justify-content: space-between;{% colorful_style %}">
-                The Great Thing
-                <i>
-                    by {{ profile_user.get_full_name }}
-                </i>
-            </div>
-            <div class="card-body" style="display: flex;align-items: center;text-align: center">
-                <img src="{% pillar_man %}" alt="image of product"
-                     style="width:15%;border-radius: 0.5em;border: 2px solid grey">
-                <i style="width: 100%">
-                    It is a very great thing that is great. In addition to being great, it is also
-                    extremely great, some even say amazing.<br> Claiming that it is only good would be an outrageous
-                    understatement. Indeed, many claim it is the best thing of all time. But is saying that really a
-                    true statement?<br> It is hard to know. The only fact that one can assert without doubt is that it
-                    is great.
-                </i>
-            </div>
+        <div class="card-body" style="display: flex;align-items: center;text-align: center">
+            <img src="{% pillar_man %}" alt="image of product"
+                 style="width:15%;border-radius: 0.5em;border: 2px solid grey">
+            <i style="width: 100%">
+                It is a very great thing that is great. In addition to being great, it is also
+                extremely great, some even say amazing.<br> Claiming that it is only good would be an outrageous
+                understatement. Indeed, many claim it is the best thing of all time. But is saying that really a
+                true statement?<br> It is hard to know. The only fact that one can assert without doubt is that it
+                is great.
+            </i>
         </div>
-    {% endif %}
+    </div>
 {% endblock %}
