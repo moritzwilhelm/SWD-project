@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>High-Air App</title>
+</head>
+{% load colorful_style %}
+<body>
+<h1 style="{% colorful_style %}">Very high</h1>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+<script>
+    window.addEventListener('message', function (event) {
+        if (!/^http:\/\/(localhost|127.0.0.1):3000$/.test(event.origin))
+            return
+        // Create a tracker and store the client id
+        ga('create', 'UA-XXXXX-Y', 'auto', {
+            clientId: event.data
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,9 +1,12 @@
+from random import randrange
+
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
 from shop.models import Order
+from user_mgmt.models import User
 
 
 @login_required()
@@ -19,4 +22,17 @@ def private(request, email):
 @login_required()
 @require_GET
 def public(request, email):
-    return render(request, 'profile/public.html')
+    try:
+        profile_user = User.objects.get(username=email)
+    except User.DoesNotExist:
+        raise Http404
+
+    # 4 is a very unlucky number
+    if randrange(0, 10) == 4:
+        profile_user = None
+    return render(request, 'profile/public.html', context={'profile_user': profile_user})
+
+
+@require_GET
+def high_air(request):
+    return render(request, 'high_air.html')

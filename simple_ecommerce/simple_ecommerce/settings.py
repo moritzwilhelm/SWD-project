@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_ecommerce.middleware.FramingControlMiddleware'
 ]
 
 ROOT_URLCONF = 'simple_ecommerce.urls'
