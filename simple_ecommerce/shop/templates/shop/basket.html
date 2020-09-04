@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    {% load static %}
+    {% load colorful_style %}
+    {% load shop_extras %}
+
+    <div id="price_display" style="display:flex;align-items:center;justify-content: space-between;">
+        <h1>Total price: {{ price|floatformat:2 }}€</h1>
+        {% if order.placed %}
+            <h1 style="float: right">(PAID at {{ order.date_placed|date:'M. d, Y' }})</h1>
+        {% endif %}
+        {% if price > 0 and not order.placed %}
+            <a class="btn" href="{% url 'shop:checkout' request.path|slice:'13:14' %}" style="{% colorful_style %}">
+                Checkout
+            </a>
+        {% endif %}
+    </div>
+    <br>
+    {% for cart_item in order.cartitem_set.iterator %}
+        {% with cart_item.product_id as product %}
+            <div class="card">
+                <div class="card-header" style="display:flex;justify-content: space-between;{% colorful_style %}">
+                    ({{ cart_item.quantity }}x) {{ product.name }}
+                    <i>
+                        by {% if product.user is not None %}
+                        {{ product.user.get_full_name }}{% elif product.partner is not None %}
+                        {{ product.partner.name }}{% else %}Speedwagon Foundation{% endif %}
+                    </i>
+                </div>
+                <div class="card-body" style="display: flex;align-items: center;text-align: center;">
+                    <img src="{{ product.image }}" alt="image of {{ product.name }}"
+                         style="width: 15%;border-radius: 0.5em;border: 2px solid grey"
+                         onerror="this.src='{% pillar_man %}'">
+                    <div style="width: 100%">{{ product.description }}</div>
+                </div>
+                <div class="card-footer"
+                     style="{% colorful_style %};display: flex;align-items: center;justify-content: space-between">
+                    <div>Price: <b>{{ cart_item.total_cost|floatformat:2 }}€</b></div>
+                    {% if not order.placed %}
+                        <form action="{% url 'shop:delete_from_basket' cart_item.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn" style="{% colorful_style %}">Delete</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <br>
+        {% endwith %}
+    {% endfor %}
+
+{% endblock %}

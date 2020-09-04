@@ -2,17 +2,22 @@ import json
 from re import match
 from urllib.parse import unquote
 
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password, check_password
 from django.db import IntegrityError
 from django.db.models import Q
 from django.forms import model_to_dict
 from django.http import HttpResponse, JsonResponse, Http404
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 
-from shop.models import Partner, Product
+from shop.models import Partner, Product, Order, CartItem, Address, Payment
 
 
 def _get_partner(request):
@@ -121,3 +126,131 @@ def register(request):
     partner.save()
 
     return HttpResponse(status=200, content=raw_token)
+
+
+@login_required()
+@require_GET
+def list_products(request):
+    return render(request, 'shop/shop.html', context={'products': Product.objects.all()})
+
+
+@login_required()
+@require_GET
+def get_product(request, product_id):
+    product = Product.objects.filter(id=product_id).values('id', 'name', 'slug', 'description', 'price', 'count')
+    if product.exists:
+        return JsonResponse(product.first(), json_dumps_params={'indent': 2})
+    else:
+        raise Http404
+
+
+@login_required()
+@require_POST
+def add_to_cart(request):
+    product_id = request.POST.get('product_id')
+    if product_id is None:
+        return HttpResponse(status=400, reason='Missing parameters')
+
+    try:
+        product = Product.objects.get(id=product_id, count__gt=0)
+    except Product.DoesNotExist:
+        messages.warning(request, 'This product is currently out of stock')
+    else:
+        order, _ = Order.objects.get_or_create(customer_id=request.user, placed=False)
+        cart_item, _ = CartItem.objects.get_or_create(product_id=product, order_id=order)
+        cart_item.quantity += 1
+        cart_item.save()
+        messages.success(request, f"Successfully added {product.name} to basket")
+    return redirect(reverse('shop:list_products'))
+
+
+@login_required()
+@require_GET
+def show_basket(request, order_id=None):
+    if order_id is None:
+        order, _ = Order.objects.get_or_create(customer_id=request.user, placed=False)
+        return redirect(reverse('shop:show_basket', kwargs={'order_id': order.id}))
+
+    try:
+        order = Order.objects.get(id=order_id, customer_id=request.user)
+    except Order.DoesNotExist:
+        return HttpResponse(status=403)
+
+    price = sum(
+        [cart_item.product_id.price for cart_item in order.cartitem_set.iterator() for i in range(cart_item.quantity)])
+    return render(request, 'shop/basket.html',
+                  context={'order': order,
+                           'price': price})
+
+
+@login_required()
+@require_POST
+def delete_from_basket(request, cart_item_id):
+    try:
+        cart_item = CartItem.objects.get(id=cart_item_id, order_id__placed=False)
+    except CartItem.DoesNotExist:
+        raise Http404
+
+    cart_item.quantity -= 1
+    cart_item.save()
+
+    if cart_item.quantity == 0:
+        cart_item.delete()
+
+    messages.success(request, f"Successfully removed 1x '{cart_item.product_id.name}' from your basket")
+
+    return redirect(reverse('shop:show_current_basket'))
+
+
+@login_required()
+@require_http_methods(['GET', 'POST'])
+def checkout(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, customer_id=request.user, placed=False)
+    except Order.DoesNotExist:
+        return HttpResponse(status=403)
+
+    if request.method == 'GET':
+        return render(request, 'shop/checkout.html', context={'order': order})
+    else:
+        for item in order.cartitem_set.iterator():
+            if item.quantity > item.product_id.count:
+                messages.warning(request, f'The requested quantity of {item.product_id.name} exceeds '
+                                          f'the currently available stock of {item.product_id.count}')
+                return redirect(reverse('shop:show_current_basket'))
+
+        street = request.POST.get('street', '')
+        city = request.POST.get('city', '')
+        zip_code = request.POST.get('zip_code', '')
+        country = request.POST.get('country', '')
+        info = request.POST.get('additional_info', '')
+        method = request.POST.get('method', '')
+
+        if not (street and city and zip_code and country and method and order.cartitem_set):
+            return HttpResponse(status=400, reason='Missing Parameters')
+
+        if method not in ['PayPal', 'Credit Card', 'Cash', 'Red stone of Aya']:
+            return HttpResponse(status=400, reason='Illegal payment method')
+
+        try:
+            address, _ = Address.objects.get_or_create(street=street, city=city, zip_code=zip_code, country=country,
+                                                       additional_info=info)
+        except ValueError:
+            return HttpResponse(400)
+
+        amount = sum([cart_item.product_id.price for cart_item in order.cartitem_set.iterator() for i in
+                      range(cart_item.quantity)])
+        payment, _ = Payment.objects.get_or_create(method=method, amount=amount)
+
+        order.shipping_address = address
+        order.payment = payment
+        order.date_placed = timezone.now().date()
+
+        for cart_item in order.cartitem_set.iterator():
+            cart_item.product_id.count -= cart_item.quantity
+            cart_item.product_id.save()
+
+        order.placed = True
+        order.save()
+        messages.success(request, 'Order successful')
+        return redirect(reverse('shop:list_products'))

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    {% load static %}
+    {% load colorful_style %}
+    <script>
+        function finalize_purchase() {
+            $('#inputs').toggle()
+            $('#savior').toggle()
+            $('#submitter').toggle()
+
+            let address = $(document.createElement('h1'))
+            address.text('Shipping Address')
+
+            let address_info = $(document.createElement('pre'))
+            address_info.text(`\n${$('#street').val()}\n${$('#city').val()}\n${$('#zip_code').val()}\n${$('#country').val()}\n${$('#additional_info').val()}\n`)
+
+            let payment = $(document.createElement('h1'))
+            payment.text('Payment Method')
+
+            let payment_info = $(document.createElement('pre'))
+            payment_info.text(`\n${$('#method').val()}`)
+
+            $('#purchase-form').before(address)
+            address.after(address_info)
+            address_info.after(payment)
+            payment.after(payment_info)
+        }
+    </script>
+    <form id="purchase-form" action="{% url 'shop:checkout' order.id %}" method="post"
+          onkeydown="return event.key !== 'Enter';">
+        {% csrf_token %}
+        <div id="inputs"
+             style="display: flex;flex-direction: column;align-items: center;border-radius:0.5em;border: 1px solid grey;padding:2vh">
+            <div>
+                <label for="street">Street</label>
+                <input id="street" name="street" value="" required>
+            </div>
+            <div>
+                <label for="city">City</label>
+                <input id="city" name="city" value="" required>
+            </div>
+            <div>
+                <label for="zip_code">ZIP code</label>
+                <input id="zip_code" name="zip_code" value="" required>
+            </div>
+            <div>
+                <label for="country">Country</label>
+                <input id="country" name="country" value="" required>
+            </div>
+            <div>
+                <label for="additional_info">Additional info</label>
+                <input id="additional_info" name="additional_info" value="">
+            </div>
+            <div>
+                <label for="method">Payment method</label>
+                <select id="method" name="method">
+                    <option value="PayPal">PayPal</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Red stone of Aya">Red stone of Aya</option>
+                </select>
+            </div>
+        </div>
+        <button id="submitter" type="submit" class="btn" style="{% colorful_style %};display: none;">
+            Submit
+        </button>
+    </form>
+    <br>
+    <button id="savior" class="btn" style="{% colorful_style %};width: 100%" onclick="finalize_purchase()">
+        Save
+    </button>
+
+{% endblock %}

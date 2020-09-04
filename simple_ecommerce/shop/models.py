@@ -20,3 +20,35 @@ class Product(models.Model):
     image = models.URLField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default=None)
     partner = models.ForeignKey(Partner, on_delete=models.CASCADE, null=True, default=None)
+
+
+class Payment(models.Model):
+    amount = models.FloatField()
+    method = models.CharField(max_length=30)
+
+
+class Address(models.Model):
+    user = models.ManyToManyField(User)
+    street = models.CharField(max_length=200)
+    city = models.CharField(max_length=200)
+    zip_code = models.IntegerField()
+    country = models.CharField(max_length=200)
+    additional_info = models.CharField(max_length=200)
+
+
+class Order(models.Model):
+    customer_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    placed = models.BooleanField(default=False)
+    date_placed = models.DateTimeField(null=True)
+    shipping_address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True)
+    payment = models.ForeignKey(Payment, on_delete=models.CASCADE, null=True)
+
+
+class CartItem(models.Model):
+    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=0)
+    order_id = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    @property
+    def total_cost(self):
+        return self.quantity * self.product_id.price
