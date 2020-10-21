@@ -23,7 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('', include('user_mgmt.urls')),
-    path('', include('shop.urls'))
+    path('', include('shop.urls')),
+    path('', include('profile.urls'))
 ]
 
 # register static files base

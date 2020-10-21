@@ -59,6 +59,16 @@
                         My Basket
                     </a>
                 </li>
+                 <li class="nav-item{% if 'private' in request.path %} active{% endif %}">
+                    <a class="nav-link" href="{% url 'profile:private' user.username %}">
+                        Private Profile
+                    </a>
+                </li>
+            <li class="nav-item{% if 'public' in request.path %} active{% endif %}">
+                    <a class="nav-link" href="{% url 'profile:public' user.username %}">
+                        Public Profile
+                    </a>
+                </li>
             </ul>
             <form action="{% url 'accounts:logout' %}" method="post">
                 {% csrf_token %}
